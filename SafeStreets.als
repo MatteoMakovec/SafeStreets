@@ -109,9 +109,9 @@ one sig Data{
 }
 
 sig DataSent{
-	violations: set ViolationSent, //violation that not contain license plate for general request 
-	accidents: set Accident, //area request
-	licensePlates: set LicensePlate, //that contains the set of violations performed
+	violations: set ViolationSent, 			//violation that not contain license plate for general request 
+	accidents: set Accident, 			//area request
+	licensePlates: set LicensePlate, 		//that contains the set of violations performed
 }{
 	accidents in Data.accidents
 	licensePlates in Data.licensePlates
