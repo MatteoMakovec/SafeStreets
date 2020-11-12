@@ -118,9 +118,9 @@ one sig Data{
 }
 
 sig DataSent{
-	violations: set ViolationSent, 	//violation that not contain license plate for general request 
+	violations: set ViolationSent, 		//violation that not contain license plate for general request 
 	accidents: set Accident, 		//area request
-	licensePlates: set LicensePlate, //that contains the set of violations performed
+	licensePlates: set LicensePlate, 	//that contains the set of violations performed
 }{
 	accidents in Data.accidents
 	licensePlates in Data.licensePlates
@@ -225,7 +225,7 @@ fact allLicensePlateAreInData {
 }
 
 fact allRealViolationAreInData {
-	all r: Report | 						// all reports maps exactly one data, where report.state = VALIDATE iff report
+	all r: Report | 					// all reports maps exactly one data, where report.state = VALIDATE iff report
 	one d: Data | 						// where report.state = VALIDATE iff report.violation = data.violations
 	r.state = VALIDATE 	
 	implies 
@@ -233,7 +233,7 @@ fact allRealViolationAreInData {
 }
 
 fact allRejectedViolationAreNotInData {
-	all r: Report | 						// all reports reaches exactly one data,
+	all r: Report | 					// all reports reaches exactly one data,
 	one d: Data | 						// where report.state = REJECTED iff report.violation != data.violations
 	r.state = REJECTED 
 	implies r.violation not in d.violations 
@@ -255,63 +255,63 @@ fact noSameReportInQueueAndRegistry {
 
 // ONE ANSWER FOR EACH REQUEST	
 fact oneAnswerRequestForEachRequest {
-	all a: AnswerRequest | 				// all answerRequests maps exactly one request, 
+	all a: AnswerRequest | 					// all answerRequests maps exactly one request, 
 	one r: Request | 					// where answerRequest.request = request
 	a.request = r 
 }
 
 // WHEN THE ANSWER IS INDIVIDUAL THE DATA SENT ARE ABOUT LICENSE PLATES
 fact correctAnswerIndividualRequest {	
-	all a: AnswerRequest | 				// for all answerRequests we have answerRequest.request = individualRequest
-	(a.request = IndividualRequest) 		// iff answerRequests.violations = null 
-	implies 							// and answerRequests.dataSent.accidents = null
-	(a.dataSent.violations = none 			// and answerRequests.dataSent.licensePlates != null
+	all a: AnswerRequest | 					// for all answerRequests we have answerRequest.request = individualRequest
+	(a.request = IndividualRequest) 			// iff answerRequests.violations = null 
+	implies 						// and answerRequests.dataSent.accidents = null
+	(a.dataSent.violations = none 				// and answerRequests.dataSent.licensePlates != null
 	and a.dataSent.accidents = none 
 	and a.dataSent.licensePlates != none )
 }
 
 // WHEN THE ANSWER IS GENERAL THE DATA SENT ARE ABOUT VIOLATIONS
 fact correctAnswerGeneralRequest {
-	all a: AnswerRequest | 				// for all answerRequests we have answerRequests.request = generalRequest
-	(a.request = GeneralRequest) 			// iff answerRequests.dataSent.violations != null 
-	implies 							// and answerRequests.dataSent.accidents = null
-	(a.dataSent.violations != none 			// and answerRequests.dataSent.licensePlates = null
+	all a: AnswerRequest | 					// for all answerRequests we have answerRequests.request = generalRequest
+	(a.request = GeneralRequest) 				// iff answerRequests.dataSent.violations != null 
+	implies 						// and answerRequests.dataSent.accidents = null
+	(a.dataSent.violations != none 				// and answerRequests.dataSent.licensePlates = null
 	and a.dataSent.accidents = none 
 	and a.dataSent.licensePlates = none)
 }
 
 // WHEN THE ANSWER IS FOT UNSAFE AREAS THE DATA SENT ARE ABOUT ACCIDENTS
 fact correctAnswerAreaRequest {
-	all a: AnswerRequest | 				// for all answerRequests we have answerRequests.request = areaRequest
-	(a.request = AreaRequest) 			// iff answerRequests.dataSent.violations = null
-	implies 							// and answerRequests.dataSent.accidents != null
-	(a.dataSent.violations = none 			// and answerRequests.dataSent.licensePlates = null
+	all a: AnswerRequest | 					// for all answerRequests we have answerRequests.request = areaRequest
+	(a.request = AreaRequest) 				// iff answerRequests.dataSent.violations = null
+	implies 						// and answerRequests.dataSent.accidents != null
+	(a.dataSent.violations = none 				// and answerRequests.dataSent.licensePlates = null
 	and a.dataSent.accidents != none 
 	and a.dataSent.licensePlates = none)
 }
 
 // EVERY VALIDATION CORRESPONDS TO A UNIQUE REPORT
 fact oneReportSentForEveryValidationReceived {
-	all v: ValidationReceived | 			// all validationReceived maps exactly one reportSent,	
+	all v: ValidationReceived | 				// all validationReceived maps exactly one reportSent,	
 	one r: ReportSent | 					// iff validationReceived.report = reportSent.report
 	r.report = v.report 
 }
 
 // WHEN A VALIDATION IS SENT, THE STATE OF THE REPORT APPEARS IN THE REGISTRY OF THE USER
 fact correctStateInValidationReceivedAndRegistry {
-	all v: ValidationReceived | 			// for all validationReceived
-	v.result = v.report.state and			//  we have validationReceived.result = validationReceived.report.state
-	all v: ValidationReceived | 			// and all validationReceived maps exactly one user
+	all v: ValidationReceived | 				// for all validationReceived
+	v.result = v.report.state and				//  we have validationReceived.result = validationReceived.report.state
+	all v: ValidationReceived | 				// and all validationReceived maps exactly one user
 	one u: User | 						// iff validationReceived.receiver = user and validationReceived.report = user.registry
 	v.receiver = u and v.report in u.registry 
 }
 
 // REPORT VALIDATE IMPLIES THAT ITS DATA ARE STORED
 fact correctValidationReceivedInData{
-	all v: ValidationReceived | 			// for all validationReceived we have validationReceived.result = VALIDATE
+	all v: ValidationReceived | 				// for all validationReceived we have validationReceived.result = VALIDATE
 	v.result = VALIDATE 					// iff (validationReceived.report.violation = data.violations
-	implies 							// and (#validationReceived.ticket = 1 
-	(v.report.violation in Data.violations 		// iff validationReceived.report.violation.ticket = validationReceived.ticket))
+	implies 						// and (#validationReceived.ticket = 1 
+	(v.report.violation in Data.violations 			// iff validationReceived.report.violation.ticket = validationReceived.ticket))
 	and (#v.ticket=1 				
 		implies 
 		v.report.violation.ticket=v.ticket))
@@ -319,10 +319,10 @@ fact correctValidationReceivedInData{
 
 // REPORT REJECTED IMPLIES THAT ITS DATA ARE DISCARDED
 fact rejectedValidation {
-	all v: ValidationReceived | 			// for all validationReceived we have validationReceived.result = REJECTED
+	all v: ValidationReceived | 				// for all validationReceived we have validationReceived.result = REJECTED
 	v.result = REJECTED 					// iff (validationReceived.report.violation != data.violations
-	implies 							// and #validationReceived.ticket = 0
-	(v.report.violation not in Data.violations   // and #validationReceived.report.violation.ticket=0
+	implies 						// and #validationReceived.ticket = 0
+	(v.report.violation not in Data.violations   		// and #validationReceived.report.violation.ticket=0
 	and #v.ticket=0 
 	and #v.report.violation.ticket=0)
 }
@@ -330,12 +330,12 @@ fact rejectedValidation {
 // ONE AREA CORRESPONDS TO A UNIQUE MUNICIPALITY
 fact areaForAUniqueMunicipality {
 	all a: Area | 						// all areas maps exactly one municipality 
-	one m: Municipality | 				// iff area = municipality.divideIn
+	one m: Municipality | 					// iff area = municipality.divideIn
 	a in m.dividedIn 
 }
 
 fact uniqueIDMunicipality {
-	all disj m, m': Municipality | 			// for all the disjunction of two municipality instances
+	all disj m, m': Municipality | 				// for all the disjunction of two municipality instances
 	m.id != m'.id 						// we have that the two instances have different id
 }
 
@@ -345,7 +345,7 @@ fact uniqueIDReport {
 }
 
 fact uniqueLicensePlate {
-	all disj l, l': LicensePlate | 			// for all the disjunction of two report instances
+	all disj l, l': LicensePlate | 				// for all the disjunction of two report instances
 	l.code != l'.code 					// we have that the two instances have different code
 	all disj c,c': Code | 					// and all the disjunction of two code instances
 	c.id != c'.id						// have that the two instances have different id
@@ -355,15 +355,15 @@ fact uniqueLicensePlate {
 fact differentAnswerRequest {
 	all disj a, a': AnswerRequest | 			// for all the disjunction of two answerRequest instances
 	a.request != a'.request 				// we have that the two instances have different request
-	and a.dataSent != a'.dataSent 			// have different dataSent
+	and a.dataSent != a'.dataSent 				// have different dataSent
 }
 
 // ALL VIOLATION SENT CORRESPONDS TO A VIOLATION
 fact oneToOneCorrespondencebetweenViolationAndViolationSent {
 	all vs: ViolationSent | 				// all violationSent maps exactly one violantion
 	one v: Violation | 					// iff violationSent.vehicleType = violantion.vehicleType
-	vs.vehicleType = v.vehicleType 			// and violationSent.violationType = violantion.violationType
-	and vs.violationType=v.violationType 	// and violationSent.exactPosition = violantion.exactPosition
+	vs.vehicleType = v.vehicleType 				// and violationSent.violationType = violantion.violationType
+	and vs.violationType=v.violationType 			// and violationSent.exactPosition = violantion.exactPosition
 	and vs.exactPosition = v.exactPosition
 }
 
