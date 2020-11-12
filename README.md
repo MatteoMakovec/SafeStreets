@@ -10,3 +10,4 @@ Versions:
 - SafeStreets.als: code to be analyzed
 - SafeStreets2.0.als: code format correction (already done in part in SafeStreets.als)
 - SafeStreets3.0.als: translation of all "facts"
+- SafeStreets4.0.als: translation also of the "assertion" (the translation of the "predicates" is not needed)
